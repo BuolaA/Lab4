@@ -4,6 +4,8 @@
  */
 package ca.sait.servlets;
 
+import ca.sait.models.User;
+import ca.sait.services.AccountService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -43,6 +45,31 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        
+        AccountService account = new AccountService();
+        User user = account.login(username, password);
+        
+        if (user != null) {
+            //User is not null
+            //Store username in session
+            
+            request.getSession().setAttribute("username", username);
+            
+            //Redirect to home page
+            
+            response.sendRedirect("home");
+            return;
+        }
+        else {
+            //User is null
+            //Display an error message in login.jsp
+            
+            String message = "Username or password is invalid";
+            request.setAttribute("message", message);
+        }
+        
         this.getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request,response);
     }
 
